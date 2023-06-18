@@ -10,6 +10,7 @@ This repository contains an Ansible script that facilitates the synchronization 
 - [Usage](#usage)
 - [Configuration](#configuration)
 - [Contributing](#contributing)
+- [License](#license)
 
 ## Introduction
 
@@ -61,3 +62,6 @@ Refer to the [lsyncd documentation](https://github.com/axkibe/lsyncd) for more i
 ## Contributing
 
 Contributions to this project are welcome! If you find any issues or have suggestions for improvements, please feel free to submit a pull request or open an issue.
+
+## License
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
