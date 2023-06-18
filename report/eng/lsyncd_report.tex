@@ -47,6 +47,9 @@ The problem at hand is the need to synchronize data between Docker Swarm cluster
 Due to the distributed nature of the cluster with its independent nodes, situations may 
 arise where data is inconsistent or out-of-sync across the nodes. Resolving this problem 
 is essential to ensure the integrity and consistency of data in the Docker Swarm environment.
+In this specific case it is not important to synchronize data in real time, 
+as these are used to configure a messaging service. So they are static and this limit 
+is not a problem.
 
 \section{Implemented Solution}
 To address the data synchronization problem between Docker Swarm cluster nodes, the 

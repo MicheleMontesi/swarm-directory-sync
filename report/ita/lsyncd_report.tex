@@ -50,6 +50,9 @@ cluster Docker Swarm. A causa della natura distribuita del cluster, con i suoi n
 indipendenti, potrebbero verificarsi situazioni in cui i dati siano inconsistenti o disallineati 
 tra i vari nodi. È fondamentale risolvere questo problema per garantire l'integrità e la coerenza 
 dei dati nell'ambiente Docker Swarm.
+In questo caso specifico non è importante la sincronizzazione dei dati in real time, in quanto
+i questi sono utilizzati per la configurazione di un servizio di messaggistica,
+quindi sono statici e questo limite non è un problema.
 
 \section{Soluzione Implementata}
 Per affrontare il problema della sincronizzazione dei dati tra i nodi del 
