@@ -1,0 +1,12 @@
+---
+# tasks file for start-lsyncd
+- name: Start and enable lsyncd
+  service:
+    name: lsyncd
+    state: started
+    enabled: yes
+
+- name: Restart lsyncd
+  service:
+    name: lsyncd
+    state: restarted

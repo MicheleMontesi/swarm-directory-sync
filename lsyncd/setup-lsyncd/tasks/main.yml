@@ -1,0 +1,38 @@
+---
+# tasks file for setup-lsyncd
+- name: Create lsyncd directory
+  file:
+    path: /etc/lsyncd
+    state: directory
+    mode: 0755
+
+- name: Create lsyncd log directory
+  file:
+    path: /var/log/lsyncd
+    state: directory
+    mode: 0755
+
+- name: Create lsyncd log files
+  file:
+    path: /var/log/lsyncd/lsyncd.log
+    state: touch
+    mode: 0644
+
+- name: Create lsyncd status file
+  file:
+    path: /var/log/lsyncd/lsyncd.status
+    state: touch
+    mode: 0644
+    
+- name: Create lsyncd configuration file
+  template:
+    src: lsyncd.conf.j2
+    dest: /etc/lsyncd/lsyncd.conf.lua
+    mode: 0644
+
+- name: Create lsyncd backup directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items: "{{ sync_dirs | flatten | unique }}"

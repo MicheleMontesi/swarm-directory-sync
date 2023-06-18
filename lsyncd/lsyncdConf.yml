@@ -1,0 +1,12 @@
+---
+- name: Setup Lsyncd
+  hosts: swarm
+  become: yes
+  roles:
+    - setup-lsyncd
+
+- name: Start Lsyncd
+  hosts: swarm
+  become: yes
+  roles:
+    - start-lsyncd

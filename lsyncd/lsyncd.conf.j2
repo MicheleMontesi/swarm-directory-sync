@@ -1,0 +1,25 @@
+settings {
+  logfile = "/var/log/lsyncd/lsyncd.log",
+  statusFile = "/var/log/lsyncd/lsyncd.status",
+  statusInterval = 30,
+  nodaemon = false
+}
+
+-- Sync local files to remote
+--[[
+  root must create a ssh key pair and copy the public key to the remote host root
+  ssh-keygen -t rsa
+  ssh-copy-id root@ip-address
+]]--
+{% for host in play_hosts %}
+{% if host != ansible_default_ipv4.address %}
+{% for sync_dir in sync_dirs | flatten | unique %}
+  sync {
+    default.rsyncssh,
+    source = "{{sync_dir}}",
+    host = "{{ host }}",
+    targetdir = "{{sync_dir}}"
+  }
+{% endfor %}
+{% endif %}
+{% endfor %}

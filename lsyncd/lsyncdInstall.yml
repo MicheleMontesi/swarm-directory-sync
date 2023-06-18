@@ -1,0 +1,9 @@
+---
+- hosts: swarm
+  become: yes
+
+  tasks:
+    - name: Install lsyncd
+      apt:
+        name: lsyncd
+        state: latest

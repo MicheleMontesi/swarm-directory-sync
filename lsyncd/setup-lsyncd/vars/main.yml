@@ -1,0 +1,5 @@
+---
+# vars file for setup-lsyncd
+sync_dirs:
+  - "/home/pi/backup"
+  - "/home/pi/backup2"
