@@ -1,69 +1,134 @@
-\documentclass{article}
+\documentclass[a4paper, 12pt]{article}
+\usepackage{listings} % For code insertion
+\usepackage{xcolor} % For code highlighting
+
+\lstset{
+  language=bash, % Code language
+  basicstyle=\fontsize{11}{12}\ttfamily, % Code text style
+  showstringspaces=false % Don't show spaces as special characters
+}
 
 % Initialization
-\title{Synchronizing Data in a Docker Swarm Cluster with MQTTS}
+\title{Data Synchronization in a Docker Swarm Cluster with MQTTS}
 \author{Michele Montesi \\
         E-Mail: michele.montesi3@studio.unibo.it}
+
+% Environments
+\newenvironment{packed_itemize}{
+\begin{itemize}
+        \setlength{\itemsep}{1pt}
+        \setlength{\parskip}{0pt}
+        \setlength{\parsep}{0pt}
+}{\end{itemize}}
 
 \begin{document}
 
 \maketitle
 
 \section{Introduction}
-This document presents the project of synchronizing data in a Docker Swarm 
-cluster using the MQTTS protocol. It will illustrate the application context, 
-the specific problem to be solved, and the implemented solution, including the 
-technologies and configurations adopted.
+This document presents the project of data synchronization in a Docker Swarm cluster that uses 
+the MQTTS protocol. It describes the application context, the specific problem 
+to solve, and the implemented solution, including the technologies and configurations adopted.
 
 \section{Application Context}
-The project starts from a Docker Swarm environment, which is a container 
-orchestration system that manages a cluster of Docker nodes. It is also assumed 
-that an MQTT (Message Queuing Telemetry Transport) messaging service has been configured 
-on all nodes of the cluster, known as MQTTS (MQTT over TLS/SSL). The use of MQTTS provides 
-secure and encrypted communication between the nodes of the Swarm cluster.
+The project starts from a Docker Swarm environment, which is a container orchestration 
+system that allows managing a cluster of Docker nodes. Additionally, it is assumed that an 
+MQTT (Message Queuing Telemetry Transport) messaging service has been configured on all 
+cluster nodes, known as MQTTS (MQTT over TLS/SSL). The use of MQTTS provides secure and 
+encrypted communication between the Swarm cluster nodes.
 
-The goal of the project is to achieve a Docker Swarm cluster where the MQTTS service 
-is running on all nodes of the cluster. Furthermore, it is necessary to ensure data 
+The project's goal is to achieve a Docker Swarm cluster where the MQTTS service is 
+running on all cluster nodes using the same data. Furthermore, it is necessary to ensure data 
 persistence and synchronization between nodes using the lsyncd utility.
 
+\newpage
 \section{Specific Problem}
-The specific problem is the need to synchronize data between nodes in the Docker 
-Swarm cluster. Due to the distributed nature of the cluster, with its independent nodes, 
-situations may arise where data is inconsistent or out of sync across the various nodes. 
-It is essential to solve this problem to ensure data integrity and consistency in the 
-Docker Swarm environment.
+The problem at hand is the need to synchronize data between Docker Swarm cluster nodes. 
+Due to the distributed nature of the cluster with its independent nodes, situations may 
+arise where data is inconsistent or out-of-sync across the nodes. Resolving this problem 
+is essential to ensure the integrity and consistency of data in the Docker Swarm environment.
 
 \section{Implemented Solution}
-To address the problem of data synchronization between nodes in the Docker Swarm cluster, 
-the following solution has been adopted:
-
-\subsection{MQTTS}
-The MQTT messaging service has been configured on all nodes of the Swarm cluster using 
-the MQTTS protocol, which provides secure and encrypted connections. The use of MQTTS 
-ensures confidentiality and authentication during communication between the nodes.
+To address the data synchronization problem between Docker Swarm cluster nodes, the 
+following solution has been adopted:
 
 \subsection{lsyncd}
-To ensure data synchronization between nodes in the cluster, the lsyncd (Live Syncing Daemon) 
-utility has been utilized. Lsyncd is a tool that monitors file changes in a directory and 
+To ensure data synchronization between cluster nodes, the lsyncd (Live Syncing Daemon) 
+utility has been used. lsyncd is a tool that monitors file changes in a directory and 
 automatically propagates them to one or more remote destinations.
 
-A specific synchronization rule has been configured in lsyncd to monitor the data 
-directories within each Docker Swarm node and automatically propagate any changes to 
-the remaining nodes. This way, any modifications made on one node will be automatically 
-and transparently synchronized with all other nodes in the cluster.
+A dedicated synchronization rule has been configured in lsyncd to monitor the data 
+directories within each Docker Swarm node and automatically propagate changes to the 
+remaining nodes. This way, any modification made on one node will be automatically 
+and transparently synchronized across all other cluster nodes.
 
-\subsection{Data Persistence}
+\subsection{Ansible}
+To automate the installation of lsyncd on all Docker Swarm cluster nodes, 
+Ansible has been used. Ansible is an IT automation framework that simplifies 
+application and infrastructure deployment, configuration, and management. 
+By utilizing Ansible playbooks, it was possible to declaratively define and execute 
+the installation and configuration operations of lsyncd on all cluster nodes.
+
+\newpage
+\section{Development of Ansible Scripts}
+The following steps were followed for the development of Ansible scripts used in this project:
+
+\subsection{Project Structure}
+The Ansible project was organized following a standard structure, consisting of the following main
+elements:
+\begin{packed_itemize}
+  \item \texttt{inventory.yml}: An inventory file listing all Docker Swarm 
+    cluster nodes where lsyncd installation will be performed.
+  \item \texttt{lsyncdInstall.yml}: The playbook that handles the installation 
+    of the lsyncd package on all Docker Swarm cluster nodes.
+  \item \texttt{lsyncdConf.yml}: The main playbook that defines the operations 
+    to be executed for lsyncd configuration.
+  \item \texttt{roles/}: A directory containing Ansible roles. 
+    Each role represents a specific functionality or configuration to be applied on cluster nodes.
+  \item \texttt{roles/setup-lsyncd/}: The role that defines lsyncd configuration 
+    on each Docker Swarm cluster node.
+  \item \texttt{roles/start-lsyncd/}: The role that defines the start of the lsyncd 
+    service on each Docker Swarm cluster node.
+\end{packed_itemize}
+
+\subsection{Defining Roles}
+To define Ansible roles for lsyncd configuration and startup, the following 
+activities were performed:
+\begin{packed_itemize}
+  \item Creation of directories:
+  \begin{packed_itemize}
+    \item \texttt{roles/setup-lsyncd/}
+    \item \texttt{roles/start-lsyncd/}
+  \end{packed_itemize}
+  \item Definition of a \texttt{tasks/main.yml} file within each role. This file 
+    contains a list of tasks to install and configure lsyncd.
+  \item Definition of lsyncd configuration files within the \texttt{setup-lsyncd} 
+    role: \texttt{templates/lsyncd.conf.j2}.
+  \item Definition of variable files within \texttt{setup-lsyncd} to define the paths 
+    to be synchronized.
+\end{packed_itemize}
+
+\subsection{Using Playbooks}
+To perform the installation and configuration of lsyncd on all Docker Swarm cluster nodes, 
+you can execute the following commands:
+\begin{lstlisting}
+ansible-playbook -i inventory.ini -vv lsyncdInstall.yml
+ansible-playbook -i inventory.ini -vv lsyncdConf.yml
+\end{lstlisting}
+
+\section{Data Persistence}
 To ensure data persistence in the Docker Swarm cluster, a Docker volume has been 
-configured for the data directories. Docker volumes allow data to be separated from the 
-container, enabling persistence even in the event of container or node restarts. 
-This ensures that data remains available even in failure or maintenance scenarios.
+configured for data directories. Docker volumes allow separating data from the container, 
+enabling them to persist even in the event of container or node restart. This guarantees 
+that the data remains available even in failure or maintenance situations. This data will 
+be synchronized using the Ansible script described earlier.
 
 \section{Conclusion}
-This report presented the project of synchronizing data in a Docker Swarm cluster with MQTTS. 
-The project was motivated by the problem of synchronizing data between independent nodes in 
-the Swarm cluster. The implemented solution, which utilizes the MQTTS protocol for secure 
-communication and the lsyncd utility for automatic data synchronization between nodes, was 
-described. The importance of data synchronization in a distributed environment like Docker 
-Swarm was emphasized to ensure data integrity and consistency across the cluster's nodes.
+This report presented the project of data synchronization in a Docker Swarm cluster 
+with MQTTS using lsyncd. The project was motivated by the data synchronization problem 
+between independent nodes in the Swarm cluster. The implemented solution, the 
+lsyncd utility for automatic data synchronization between nodes, was introduced. 
+The importance of data synchronization in a distributed environment like Docker 
+Swarm was emphasized to ensure data integrity and consistency across cluster nodes.
 
 \end{document}
